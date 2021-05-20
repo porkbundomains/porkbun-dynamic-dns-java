@@ -4,6 +4,8 @@ This is a quick and dirty dynamic DNS client written in Java for Porkbun's DNS m
 
 BUILD THE APP
 
+Run the makefile or:
+
 javac -cp "./libs/httpcomponents-client-5.0.3/lib/httpclient5-5.0.3.jar:./libs/httpcomponents-client-5.0.3/lib/httpcore5-5.0.2.jar:./libs/httpcomponents-client-5.0.3/lib/slf4j-api-1.7.25.jar:./libs/json.jar" -d . PorkbunDynDNSClient.java
 
 RUN THE APP
