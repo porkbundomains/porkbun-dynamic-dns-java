@@ -20,6 +20,11 @@ import org.slf4j.LoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
+
 /**
 */
 public class PorkbunDynDNSClient
@@ -27,6 +32,53 @@ public class PorkbunDynDNSClient
 	static String endpoint = "";
 	static String apikey = "";
 	static String secretapikey = "";
+
+	private static String getLocalIPv6Address() throws IOException
+	{
+		InetAddress inetAddress = null;
+		Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+	outer:
+		while (networkInterfaces.hasMoreElements())
+		{
+			Enumeration<InetAddress> inetAds = networkInterfaces.nextElement().getInetAddresses();
+			while (inetAds.hasMoreElements())
+			{
+				inetAddress = inetAds.nextElement();
+				//Check if it‘s ipv6 address and reserved address
+				if (inetAddress instanceof Inet6Address && !isReservedAddr(inetAddress))
+				{
+					break outer;
+				}
+			}
+		}
+
+		String ipAddr = inetAddress.getHostAddress();
+		// Filter network card No
+		int index = ipAddr.indexOf("%");
+		if (index > 0) {
+			ipAddr = ipAddr.substring(0, index);
+		}
+
+		return ipAddr;
+	}
+
+	/**
+	 * Check if it‘s "local address" or "link local address" or
+	 * "loopbackaddress"
+	 *
+	 * @param ip address
+	 *
+	 * @return result
+	 */
+	private static boolean isReservedAddr(InetAddress inetAddr)
+	{
+		if (inetAddr.isAnyLocalAddress() || inetAddr.isLinkLocalAddress() || inetAddr.isLoopbackAddress())
+		{
+			return true;
+		}
+
+		return false;
+	}
 
  	public static void main(String[] args)
 	{
@@ -73,16 +125,32 @@ public class PorkbunDynDNSClient
 		String realIp = "";
 
 		// ping API to get current IP
-		JSONObject pingResult = ping();
-		if(!pingResult.get("status").toString().equals("SUCCESS"))
+
+		if(recordType.equals("AAAA"))
 		{
-			System.out.println("Could not get ping result from API.");
+			try
+			{
+				realIp = getLocalIPv6Address().toLowerCase();
+				System.out.println("Detected current IPv6 as "+realIp+".");
+			}
+			catch(Exception e) 
+			{
+  				e.printStackTrace();
+				System.out.println("Could not get IPv6 from local computer.");
+				System.exit(0);
+			}
+		} else {
+			JSONObject pingResult = ping();
+			if(!pingResult.get("status").toString().equals("SUCCESS"))
+			{
+				System.out.println("Could not get ping result from API.");
+				System.out.println(pingResult);
+				System.exit(0);
+			}
 			System.out.println(pingResult);
-			System.exit(0);
+			realIp = pingResult.get("yourIp").toString().toLowerCase();
+			System.out.println("Detected current IPv4 as "+realIp+".");
 		}
-		System.out.println(pingResult);
-		realIp = pingResult.get("yourIp").toString().toLowerCase();
-		System.out.println("Detected current IP as "+realIp+".");
 
 		// get current records
 		JSONObject retrieveResult = retrieve(domainName);
