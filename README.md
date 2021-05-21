@@ -9,6 +9,8 @@ Run `make`, or alternatively run:
 ```
 javac -cp "./libs/httpcomponents-client-5.0.3/lib/httpclient5-5.0.3.jar:./libs/httpcomponents-client-5.0.3/lib/httpcore5-5.0.2.jar:./libs/httpcomponents-client-5.0.3/lib/slf4j-api-1.7.25.jar:./libs/json.jar" -d . PorkbunDynDNSClient.java
 ```
+### Build a JAR
+Run `make jar`.
 
 ## RUN THE APP
 
@@ -22,4 +24,20 @@ java -cp ./:./libs/httpcomponents-client-5.0.3/lib/httpcore5-5.0.2.jar:./libs/ht
 Check A record for `example.com`:
 ```
 java -cp ./:./libs/httpcomponents-client-5.0.3/lib/httpcore5-5.0.2.jar:./libs/httpcomponents-client-5.0.3/lib/httpclient5-5.0.3.jar:./libs/httpcomponents-client-5.0.3/lib/slf4j-api-1.7.25.jar:./libs/json.jar PorkbunDynDNSClient example.com "" A
+```
+### Run the JAR
+
+Check A record for `example.com`:
+```
+java -jar porkbun-ddns.jar example.com "" A
+```
+
+Check A record for `www.example.com`:
+```
+java -jar porkbun-ddns.jar example.com "www" A
+```
+
+Check AAAA record for `www.example.com`:
+```
+java -jar porkbun-ddns.jar example.com "www" AAAA
 ```
