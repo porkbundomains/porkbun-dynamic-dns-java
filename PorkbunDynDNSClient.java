@@ -33,59 +33,13 @@ public class PorkbunDynDNSClient
 	static String apikey = "";
 	static String secretapikey = "";
 
-	private static String getLocalIPv6Address() throws IOException
-	{
-		InetAddress inetAddress = null;
-		Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-outer:
-		while (networkInterfaces.hasMoreElements())
-		{
-			Enumeration<InetAddress> inetAds = networkInterfaces.nextElement().getInetAddresses();
-			while (inetAds.hasMoreElements())
-			{
-				inetAddress = inetAds.nextElement();
-				//Check if it‘s ipv6 address and reserved address
-				if (inetAddress instanceof Inet6Address && !isReservedAddr(inetAddress))
-				{
-					break outer;
-				}
-			}
-		}
-
-		String ipAddr = inetAddress.getHostAddress();
-		// Filter network card No
-		int index = ipAddr.indexOf("%");
-		if (index > 0) {
-			ipAddr = ipAddr.substring(0, index);
-		}
-
-		return ipAddr;
-	}
-
-	/**
-	 * Check if it‘s "local address" or "link local address" or
-	 * "loopbackaddress"
-	 *
-	 * @param ip address
-	 *
-	 * @return result
-	 */
-	private static boolean isReservedAddr(InetAddress inetAddr)
-	{
-		if (inetAddr.isAnyLocalAddress() || inetAddr.isLinkLocalAddress() || inetAddr.isLoopbackAddress())
-		{
-			return true;
-		}
-
-		return false;
-	}
 
 	public static void main(String[] args)
 	{
 		if (args.length < 3)
 		{
 			System.out.println("Required arguments are domain, subdomain, record type\nExample 1: yourdomain.com \"www\" A\nExample 2: yourdomain.com \"\" A");
-			return;
+			System.exit(6);
 		}
 
 		String domainName = args[0].toLowerCase();
@@ -99,20 +53,10 @@ outer:
 		// read config file
 		try
 		{
-			/*
-				FileInputStream fis = new FileInputStream(config);
-				byte[] data = new byte[(int) config.length()];
-				fis.read(data);
-				fis.close();
-				config.read(data);
-				config.close();
-				*/
-
 			InputStream config = PorkbunDynDNSClient.class.getResourceAsStream("/config.json");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(config));
 
-			//String configStr = new String(data, "UTF-8");
-			String configStr = reader.readLine();
+			String configStr = reader.readLine(); // for now, only reads one line; so config file must be all in one line
 			reader.close();
 			config.close();
 
@@ -151,9 +95,11 @@ outer:
 				System.out.println("Could not get IPv6 from local computer.");
 				System.exit(2);
 			}
-		} else {
-			// otherwise, record requires an IPv4 address.
-			// Ping the API for the IPv4 address
+		}
+		else
+		{
+			// else, record requires an IPv4 address.
+			// ping the API for the IPv4 address
 
 			JSONObject pingResult = ping();
 			if(!pingResult.get("status").toString().equals("SUCCESS"))
@@ -205,6 +151,53 @@ outer:
 			}
 		}
 		System.exit(0);
+	}
+
+	private static String getLocalIPv6Address() throws IOException
+	{
+		InetAddress inetAddress = null;
+		Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+outer:
+		while (networkInterfaces.hasMoreElements())
+		{
+			Enumeration<InetAddress> inetAds = networkInterfaces.nextElement().getInetAddresses();
+			while (inetAds.hasMoreElements())
+			{
+				inetAddress = inetAds.nextElement();
+				//Check if it‘s ipv6 address and reserved address
+				if (inetAddress instanceof Inet6Address && !isReservedAddr(inetAddress))
+				{
+					break outer;
+				}
+			}
+		}
+
+		String ipAddr = inetAddress.getHostAddress();
+		// Filter network card No
+		int index = ipAddr.indexOf("%");
+		if (index > 0) {
+			ipAddr = ipAddr.substring(0, index);
+		}
+
+		return ipAddr;
+	}
+
+	/**
+	 * Check if it‘s "local address" or "link local address" or
+	 * "loopbackaddress"
+	 *
+	 * @param ip address
+	 *
+	 * @return result
+	 */
+	private static boolean isReservedAddr(InetAddress inetAddr)
+	{
+		if (inetAddr.isAnyLocalAddress() || inetAddr.isLinkLocalAddress() || inetAddr.isLoopbackAddress())
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	static JSONObject edit(String domain, String id, String name, String type, String content, String ttl, String prio)
