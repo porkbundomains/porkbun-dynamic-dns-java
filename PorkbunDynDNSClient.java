@@ -32,6 +32,7 @@ public class PorkbunDynDNSClient
 	static String endpoint = "";
 	static String apikey = "";
 	static String secretapikey = "";
+	static Boolean verbose = false;
 
 
 	public static void main(String[] args)
@@ -45,6 +46,13 @@ public class PorkbunDynDNSClient
 		String domainName = args[0].toLowerCase();
 		String subDomain = args[1].toLowerCase();
 		String recordType = args[2].toUpperCase();
+
+		Boolean verbose = false;
+
+		if(args.length > 3 && args[3].toLowerCase().equals("-v"))
+		{
+			verbose = true;
+		}
 
 		String hostName = domainName;
 		if(subDomain.length() > 0)
@@ -67,8 +75,11 @@ public class PorkbunDynDNSClient
 			secretapikey = configObj.get("secretapikey").toString();
 
 			System.out.println("API endpoint: "+endpoint);
-			System.out.println("apikey: "+apikey);
-			System.out.println("secretapikey: "+secretapikey);
+			if(verbose)
+			{
+				System.out.println("apikey: "+apikey);
+				System.out.println("secretapikey: "+secretapikey);
+			}
 		}
 		catch(Exception e)
 		{
@@ -108,7 +119,11 @@ public class PorkbunDynDNSClient
 				System.out.println(pingResult);
 				System.exit(3);
 			}
-			System.out.println(pingResult);
+
+			if(verbose)
+			{
+				System.out.println(pingResult);
+			}
 			realIp = pingResult.get("yourIp").toString().toLowerCase();
 			System.out.println("Detected current IPv4 as "+realIp+".");
 		}
@@ -121,7 +136,11 @@ public class PorkbunDynDNSClient
 			System.out.println(retrieveResult);
 			System.exit(4);
 		}
-		System.out.println(retrieveResult);
+
+		if(verbose)
+		{
+			System.out.println(retrieveResult);
+		}
 		JSONArray records = (JSONArray)retrieveResult.get("records");
 		for(int i = 0; i < records.length(); i++)
 		{
