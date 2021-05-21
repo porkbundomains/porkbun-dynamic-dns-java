@@ -99,12 +99,22 @@ public class PorkbunDynDNSClient
 		// read config file
 		try
 		{
-			File config = new File("./config.json");
-			FileInputStream fis = new FileInputStream(config);
-			byte[] data = new byte[(int) config.length()];
-			fis.read(data);
-			fis.close();
-			String configStr = new String(data, "UTF-8");
+			/*
+			 FileInputStream fis = new FileInputStream(config);
+			 byte[] data = new byte[(int) config.length()];
+			 fis.read(data);
+			 fis.close();
+			 config.read(data);
+			 config.close();
+			 */
+
+			InputStream config = PorkbunDynDNSClient.class.getResourceAsStream("/config.json");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(config));
+
+			//String configStr = new String(data, "UTF-8");
+			String configStr = reader.readLine();
+			reader.close();
+			config.close();
 
 			JSONObject configObj = new JSONObject(configStr);
 

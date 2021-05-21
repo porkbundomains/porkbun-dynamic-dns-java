@@ -14,7 +14,7 @@ Run `make jar`.
 
 ## RUN THE APP
 
-First, rename the file config.json.example to config.json and update it with your API keys. You'll also need to ensure that API access is granted for the domain.
+First, rename the file `config.json.example` to `config.json` and update it with your API keys. You'll also need to ensure that API access is granted for the domain.
 
 Check A record for `www.example.com`:
 ```
