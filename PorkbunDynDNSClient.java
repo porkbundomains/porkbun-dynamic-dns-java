@@ -37,7 +37,7 @@ public class PorkbunDynDNSClient
 	{
 		InetAddress inetAddress = null;
 		Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-	outer:
+outer:
 		while (networkInterfaces.hasMoreElements())
 		{
 			Enumeration<InetAddress> inetAds = networkInterfaces.nextElement().getInetAddresses();
@@ -80,7 +80,7 @@ public class PorkbunDynDNSClient
 		return false;
 	}
 
- 	public static void main(String[] args)
+	public static void main(String[] args)
 	{
 		if (args.length < 3)
 		{
@@ -100,13 +100,13 @@ public class PorkbunDynDNSClient
 		try
 		{
 			/*
-			 FileInputStream fis = new FileInputStream(config);
-			 byte[] data = new byte[(int) config.length()];
-			 fis.read(data);
-			 fis.close();
-			 config.read(data);
-			 config.close();
-			 */
+				FileInputStream fis = new FileInputStream(config);
+				byte[] data = new byte[(int) config.length()];
+				fis.read(data);
+				fis.close();
+				config.read(data);
+				config.close();
+				*/
 
 			InputStream config = PorkbunDynDNSClient.class.getResourceAsStream("/config.json");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(config));
@@ -133,12 +133,15 @@ public class PorkbunDynDNSClient
 		}
 
 		String realIp = "";
+		
+		// get current IP
 
-		// ping API to get current IP
+		// if record requires an IPv6 address
 		if(recordType.equals("AAAA"))
 		{
 			try
 			{
+				// get IPv6 address from local computer
 				realIp = getLocalIPv6Address().toLowerCase();
 				System.out.println("Detected current IPv6 as "+realIp+".");
 			}
@@ -149,6 +152,9 @@ public class PorkbunDynDNSClient
 				System.exit(2);
 			}
 		} else {
+			// otherwise, record requires an IPv4 address.
+			// Ping the API for the IPv4 address
+
 			JSONObject pingResult = ping();
 			if(!pingResult.get("status").toString().equals("SUCCESS"))
 			{
@@ -242,29 +248,29 @@ public class PorkbunDynDNSClient
 
 		try (final CloseableHttpClient httpclient = HttpClients.createDefault())
 		{
-            		final HttpPost httpPost = new HttpPost(url);
+			final HttpPost httpPost = new HttpPost(url);
 
-    			StringEntity entity = new StringEntity(data.toString());
+			StringEntity entity = new StringEntity(data.toString());
 			httpPost.setEntity(entity);
 
-            		try (final CloseableHttpResponse response = httpclient.execute(httpPost)) 
+			try (final CloseableHttpResponse response = httpclient.execute(httpPost)) 
 			{
-                		System.out.println(response.getCode() + " " + response.getReasonPhrase());
-                		final HttpEntity entity2 = response.getEntity();
+				System.out.println(response.getCode() + " " + response.getReasonPhrase());
+				final HttpEntity entity2 = response.getEntity();
 				String responseString = EntityUtils.toString(entity2, "UTF-8");
 				result = new JSONObject(responseString);
 
-                		EntityUtils.consume(entity2);
-            		}
+				EntityUtils.consume(entity2);
+			}
 			catch(Exception e) 
 			{
-  				e.printStackTrace();
+				e.printStackTrace();
 				return(null);
 			}
 		}
 		catch(Exception e) 
 		{
-  			e.printStackTrace();
+			e.printStackTrace();
 			return(null);
 		}
 
