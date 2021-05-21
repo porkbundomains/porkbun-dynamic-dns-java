@@ -119,13 +119,12 @@ public class PorkbunDynDNSClient
 		catch(Exception e)
 		{
 			e.printStackTrace();
-			System.exit(0);
+			System.exit(1);
 		}
 
 		String realIp = "";
 
 		// ping API to get current IP
-
 		if(recordType.equals("AAAA"))
 		{
 			try
@@ -135,9 +134,9 @@ public class PorkbunDynDNSClient
 			}
 			catch(Exception e) 
 			{
-  				e.printStackTrace();
+				e.printStackTrace();
 				System.out.println("Could not get IPv6 from local computer.");
-				System.exit(0);
+				System.exit(2);
 			}
 		} else {
 			JSONObject pingResult = ping();
@@ -145,7 +144,7 @@ public class PorkbunDynDNSClient
 			{
 				System.out.println("Could not get ping result from API.");
 				System.out.println(pingResult);
-				System.exit(0);
+				System.exit(3);
 			}
 			System.out.println(pingResult);
 			realIp = pingResult.get("yourIp").toString().toLowerCase();
@@ -158,7 +157,7 @@ public class PorkbunDynDNSClient
 		{
 			System.out.println("Could not get records from API.");
 			System.out.println(retrieveResult);
-			System.exit(0);
+			System.exit(4);
 		}
 		System.out.println(retrieveResult);
 		JSONArray records = (JSONArray)retrieveResult.get("records");
@@ -183,12 +182,13 @@ public class PorkbunDynDNSClient
 					{
 						System.out.println("Could not edit record via API.");
 						System.out.println(editResult);
-						System.exit(0);
+						System.exit(5);
 					}
 					System.out.println(editResult);
 				}
 			}
 		}
+		System.exit(0);
 	}
 
 	static JSONObject edit(String domain, String id, String name, String type, String content, String ttl, String prio)
