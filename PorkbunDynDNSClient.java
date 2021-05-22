@@ -66,33 +66,46 @@ public class PorkbunDynDNSClient
 		if(subDomain.length() > 0)
 			hostName = subDomain+"."+domainName;
 
-		// read config file
-		try
+		// check if all is filled not
+		if (!(endpoint.length() > 0 && apikey.length() > 0 && secretapikey.length() > 0))
 		{
-			InputStream config = PorkbunDynDNSClient.class.getResourceAsStream("/config.json");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(config));
-
-			String configStr = reader.readLine(); // for now, only reads one line; so config file must be all in one line
-			reader.close();
-			config.close();
-
-			JSONObject configObj = new JSONObject(configStr);
-
-			endpoint = configObj.get("endpoint").toString();
-			apikey = configObj.get("apikey").toString();
-			secretapikey = configObj.get("secretapikey").toString();
-
-			System.out.println("API endpoint: "+endpoint);
-			if(verbose)
+			// read config file
+			try
 			{
-				System.out.println("apikey: "+apikey);
-				System.out.println("secretapikey: "+secretapikey);
+				InputStream config = PorkbunDynDNSClient.class.getResourceAsStream("/config.json");
+				BufferedReader reader = new BufferedReader(new InputStreamReader(config));
+
+				String configStr = reader.readLine(); // for now, only reads one line; so config file must be all in one line
+				reader.close();
+				config.close();
+
+				JSONObject configObj = new JSONObject(configStr);
+
+				if (endpoint.length() == 0)
+				{
+					endpoint = configObj.get("endpoint").toString();
+				}
+				if (apikey.length() == 0)
+				{
+					apikey = configObj.get("apikey").toString();
+				}
+				if (secretapikey.length() == 0)
+				{
+					secretapikey = configObj.get("secretapikey").toString();
+				}
+
+				System.out.println("API endpoint: "+endpoint);
+				if(verbose)
+				{
+					System.out.println("apikey: "+apikey);
+					System.out.println("secretapikey: "+secretapikey);
+				}
 			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			System.exit(1);
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				System.exit(1);
+			}
 		}
 
 		String realIp = "";
