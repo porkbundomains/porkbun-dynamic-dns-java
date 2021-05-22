@@ -43,11 +43,19 @@ public class PorkbunDynDNSClient
 			System.exit(6);
 		}
 
-		String domainName = args[0].toLowerCase();
-		String subDomain = args[1].toLowerCase();
-		String recordType = args[2].toUpperCase();
-
 		Boolean verbose = false;
+		short startReqArgs = 0;
+
+		if (args[0].toLowerCase().equals("-v"))
+		{
+			verbose = true;
+			startReqArgs = 1;
+		}
+
+		String domainName = args[startReqArgs+0].toLowerCase();
+		String subDomain = args[startReqArgs+1].toLowerCase();
+		String recordType = args[startReqArgs+2].toUpperCase();
+
 
 		if(args.length > 3 && args[3].toLowerCase().equals("-v"))
 		{
